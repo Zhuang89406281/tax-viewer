@@ -179,7 +179,12 @@ var ENTRIES_DATA,NOTES={};
 
 // === GitHub API Layer (cloud sync + localStorage cache) ===
 var GH_REPO = 'Zhuang89406281/tax-viewer';
-var GH_TOKEN = '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';
+var GH_TOKEN = (function(){
+  // Token from URL hash: #token=ghp_xxx  or from localStorage
+  var m = location.hash.match(/token=([a-zA-Z0-9_]+)/);
+  if(m){ localStorage.setItem('gh_token', m[1]); location.hash=''; return m[1]; }
+  return localStorage.getItem('gh_token') || '';
+})();
 var GH_FILE = 'shared_data.json';
 var GH_SHA = '';  // current file SHA for updates
 var _ghAvailable = false;
