@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>PW Test</title>
+<style>body{background:#0d1117;color:#e6edf3;font-family:sans-serif;margin:0}</style></head><body>
+<div id="app"></div>
+<script>
+var _pw=(function(){var a='321@cetni';var b='xed';return b.split('').reverse().join('')+a.split('').reverse().join('')})();
+var PW_AUTHED=sessionStorage.getItem('pw_ok')==='1';
+function showPwGate(){
+  document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0d1117"><div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:40px;text-align:center;max-width:400px"><div style="font-size:48px;margin-bottom:16px">&#128274;</div><div style="color:#e6edf3;font-size:20px;font-weight:600;margin-bottom:8px">&#31246;&#36153;&#26597;&#30475;&#22120;</div><div style="color:#8b949e;font-size:14px;margin-bottom:24px">&#35831;&#36755;&#20837;&#35775;&#38382;&#23494;&#30721;</div><input id="pwInput" type="password" placeholder="&#23494;&#30721;" style="width:100%;padding:12px 16px;border:1px solid #30363d;border-radius:8px;background:#0d1117;color:#e6edf3;font-size:16px;outline:none;box-sizing:border-box"><div id="pwErr" style="color:#f85149;font-size:13px;margin-top:8px;display:none">&#23494;&#30721;&#38169;&#35823;</div><button id="pwBtn" style="width:100%;margin-top:16px;padding:12px;background:#238636;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600">&#36827;&#20837;</button></div></div>';
+  document.getElementById('pwInput').focus();
+  document.getElementById('pwInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('pwBtn').click()});
+  document.getElementById('pwBtn').addEventListener('click',function(){
+    var v=document.getElementById('pwInput').value;
+    if(v===_pw){sessionStorage.setItem('pw_ok','1');document.body.innerHTML='<div style="padding:40px;color:#0f0;font-size:24px">&#23494;&#30721;&#27491;&#30830;&#65292;&#27491;&#22312;&#21152;&#36733;...</div>';setTimeout(function(){location.reload()},500)}
+    else{document.getElementById('pwErr').style.display='block';document.getElementById('pwInput').value='';document.getElementById('pwInput').focus()}
+  });
+}
+var _pwBlocked=false;
+if(!PW_AUTHED){showPwGate();_pwBlocked=true;}
+else{
+  document.getElementById('app').innerHTML='<h1 style="padding:40px">&#10003; GitHub Pages &#23494;&#30721;&#20445;&#25252;&#27979;&#35797;&#25104;&#21151;!</h1><p style="padding:0 40px">&#23494;&#30721;:'+_pw+' | &#21047;&#26032;&#19981;&#38656;&#37325;&#26032;&#36755;&#20837;&#23494;&#30721;</p>';
+}
+</script>
+</body></html>
