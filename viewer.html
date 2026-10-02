@@ -178,7 +178,8 @@ var ENTRIES_DATA,NOTES={};
 
 
 // === GitHub API Layer (cloud sync + localStorage cache) ===
-var GH_REPO = 'Zhuang89406281/tax-viewer';
+var GH_REPO = 'Zhuang89406281/tax-viewer';  // public repo for Pages
+var GH_DATA_REPO = 'Zhuang89406281/tax-viewer-data';  // private repo for data
 var GH_TOKEN = (function(){
   // Token from URL hash: #token=ghp_xxx  or from localStorage
   var m = location.hash.match(/token=([a-zA-Z0-9_]+)/);
@@ -190,7 +191,7 @@ var GH_SHA = '';  // current file SHA for updates
 var _ghAvailable = false;
 
 function apiLoad() {
-  fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE, {
+  fetch('https://api.github.com/repos/' + GH_DATA_REPO + '/contents/' + GH_FILE, {
     headers: {'Authorization': 'token ' + GH_TOKEN, 'User-Agent': 'hermes'}
   }).then(function(r) {
     if (!r.ok) { _ghAvailable = false; return null; }
@@ -211,8 +212,8 @@ function apiLoad() {
 function apiSave(changes) {
   if (!_ghAvailable && !GH_SHA) return;
   // Read current cloud data, merge changes, then write back
-  var url = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE;
-  fetch(url, {
+  var url = 'https://api.github.com/repos/' + GH_DATA_REPO + '/contents/' + GH_FILE;
+    fetch(url, {
     headers: {'Authorization': 'token ' + GH_TOKEN, 'User-Agent': 'hermes'}
   }).then(function(r) { return r.json(); }).then(function(finfo) {
     if(!finfo||!finfo.content)return;
@@ -294,8 +295,9 @@ function init(){
 }
 function loadDataFromGitHub(){
   document.getElementById('app').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0d1117;color:#58a6ff;font-size:18px">&#8987; &#27491;&#22312;&#21152;&#36733;&#31246;&#36153;&#25968;&#25454;...</div>';
-  var repo=GH_REPO;var tk=GH_TOKEN;
-  var apiBase='https://api.github.com/repos/'+repo+'/contents/';
+  var tk=GH_TOKEN;
+  var dataRepo=GH_DATA_REPO;
+  var apiBase='https://api.github.com/repos/'+dataRepo+'/contents/';
   var hdrs={'Authorization':'token '+tk,'Accept':'application/vnd.github.raw+json'};
   fetch(apiBase+'viewer_data_full.json?ref=main',{headers:hdrs})
   .then(function(r){if(!r.ok)throw new Error('data '+r.status);return r.json()})
