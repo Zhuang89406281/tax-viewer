@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head><script>
-window.onerror=function(msg,url,line){document.body.innerHTML='<pre style="color:red;padding:20px;font-size:14px">JS Error: '+msg+'\nLine: '+line+'\nURL: '+url+'</pre>';return true};
-</script>
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>主体税费申报核对查看器</title>
@@ -279,9 +277,9 @@ function showPwGate(){
   });
 }
 var _pwBlocked=false;
-if(!PW_AUTHED){showPwGate();_pwBlocked=true;}else{document.title='[已认证-加载中] 税费查看器';}
+if(!PW_AUTHED){showPwGate();_pwBlocked=true;}else{}
 
-function init(){document.title='[加载中] 税费查看器';
+function init(){
   try{var s=localStorage.getItem('taxRiskStatus5');if(s)RISK_STATUS=JSON.parse(s)}catch(e){}
   try{var n=localStorage.getItem('taxNotes');if(n)NOTES=JSON.parse(n)}catch(e){}
   DATA=JSON.parse(document.getElementById('jdata').textContent);
