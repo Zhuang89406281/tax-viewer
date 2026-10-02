@@ -261,6 +261,31 @@ window.addEventListener('beforeunload',function(){
   localStorage.setItem('taxRules',JSON.stringify(TAX_RULES));
 });
 
+
+// === Password Gate ===
+var PW_HASH = '8bdb70f86b3b6aa7c64e77d6ad654a8f7682d11f00b99d13bc757ddb9d775500';
+function sha256(s){var h=new TextEncoder().encode(s);return crypto.subtle.digest('SHA-256',h).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')})}
+function checkPassword(pw){return sha256(pw).then(function(h){return h===PW_HASH})}
+function showPwGate(){
+  document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0d1117"><div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:40px;text-align:center;max-width:400px"><div style="font-size:48px;margin-bottom:16px">🔐</div><div style="color:#e6edf3;font-size:20px;font-weight:600;margin-bottom:8px">税费申报核对查看器</div><div style="color:#8b949e;font-size:14px;margin-bottom:24px">请输入访问密码</div><input id="pwInput" type="password" placeholder="密码" style="width:100%;padding:12px 16px;border:1px solid #30363d;border-radius:8px;background:#0d1117;color:#e6edf3;font-size:16px;outline:none;box-sizing:border-box" onkeydown="if(event.key===\'Enter\')pwSubmit()"><div id="pwErr" style="color:#f85149;font-size:13px;margin-top:8px;display:none">密码错误，请重试</div><button onclick="pwSubmit()" style="width:100%;margin-top:16px;padding:12px;background:#238636;color:#fff;border:none;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600">进入</button></div></div>';
+  document.getElementById('pwInput').focus();
+}
+function pwSubmit(){
+  var pw=document.getElementById('pwInput').value;
+  checkPassword(pw).then(function(ok){
+    if(ok){sessionStorage.setItem('pw_ok','1');location.reload()}
+    else{document.getElementById('pwErr').style.display='block';document.getElementById('pwInput').value='';document.getElementById('pwInput').focus()}
+  });
+}
+// Check if already authenticated
+if(sessionStorage.getItem('pw_ok')!=='1'){
+  // Override render to show gate instead
+  var _origRender=typeof render==='function'?render:null;
+  showPwGate();
+  // Prevent init from running
+  throw new Error('PW_GATE');
+}
+
 function init(){
   try{var s=localStorage.getItem('taxRiskStatus5');if(s)RISK_STATUS=JSON.parse(s)}catch(e){}
   try{var n=localStorage.getItem('taxNotes');if(n)NOTES=JSON.parse(n)}catch(e){}
