@@ -184,7 +184,7 @@ var GH_REPO = 'Zhuang89406281/tax-viewer';
 var GH_TOKEN = (function(){
   // Token from URL hash: #token=ghp_xxx  or from localStorage
   var m = location.hash.match(/token=([a-zA-Z0-9_]+)/);
-  if(m){ localStorage.setItem('gh_token', m[1]); location.hash=''; return m[1]; }
+  if(m){ localStorage.setItem('gh_token', m[1]); history.replaceState(null,'',location.pathname+location.search); return m[1]; }
   return localStorage.getItem('gh_token') || '';
 })();
 var GH_FILE = 'shared_data.json';
@@ -198,7 +198,7 @@ function apiLoad() {
     if (!r.ok) { _ghAvailable = false; return null; }
     return r.json();
   }).then(function(finfo) {
-    if (!finfo) return;
+    if (!finfo || !finfo.content) return;
     _ghAvailable = true;
     GH_SHA = finfo.sha;
     var d = JSON.parse(atob(finfo.content));
@@ -217,6 +217,7 @@ function apiSave(changes) {
   fetch(url, {
     headers: {'Authorization': 'token ' + GH_TOKEN, 'User-Agent': 'hermes'}
   }).then(function(r) { return r.json(); }).then(function(finfo) {
+    if(!finfo||!finfo.content)return;
     GH_SHA = finfo.sha;
     var cloudData = JSON.parse(atob(finfo.content));
     // Merge incoming changes
@@ -349,7 +350,7 @@ function tcBadge(entityId,full){
   return '<span style="margin-left:6px;font-size:'+(full?'12':'10')+'px;color:#f59e0b" title="完税证明：'+tc+'">⚠️'+(full?' '+tc:'特殊')+'</span>';
 }
 
-var TAX_RULES=JSON.parse(localStorage.getItem('taxRules')||'{}');
+var TAX_RULES={};try{TAX_RULES=JSON.parse(localStorage.getItem('taxRules')||'{}')}catch(e){TAX_RULES={}};
 function saveTaxRules(){localStorage.setItem('taxRules',JSON.stringify(TAX_RULES));apiSave({taxRules:TAX_RULES})}
 function renderTaxRules(){
   if(!ENTITY_FILTER)return '';
