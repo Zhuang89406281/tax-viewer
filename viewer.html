@@ -190,6 +190,13 @@ var GH_FILE = 'shared_data.json';
 var GH_SHA = '';  // current file SHA for updates
 var _ghAvailable = false;
 
+// Base64 -> UTF-8 string (atob alone yields latin-1 bytes and mangles CJK text)
+function b64ToUtf8(b64){
+  var bin=atob(b64);var arr=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(arr);
+}
+
 function apiLoad() {
   fetch('https://api.github.com/repos/' + GH_DATA_REPO + '/contents/' + GH_FILE, {
     headers: {'Authorization': 'token ' + GH_TOKEN, 'User-Agent': 'hermes'}
@@ -200,7 +207,7 @@ function apiLoad() {
     if (!finfo || !finfo.content) return;
     _ghAvailable = true;
     GH_SHA = finfo.sha;
-    var d = JSON.parse(atob(finfo.content));
+    var d = JSON.parse(b64ToUtf8(finfo.content));
     // Merge cloud data into local (cloud wins on conflict)
     if (d.notes) { Object.assign(NOTES, d.notes); localStorage.setItem('taxNotes', JSON.stringify(NOTES)); }
     if (d.riskStatus) { Object.assign(RISK_STATUS, d.riskStatus); localStorage.setItem('taxRiskStatus5', JSON.stringify(RISK_STATUS)); }
@@ -218,7 +225,7 @@ function apiSave(changes) {
   }).then(function(r) { return r.json(); }).then(function(finfo) {
     if(!finfo||!finfo.content)return;
     GH_SHA = finfo.sha;
-    var cloudData = JSON.parse(atob(finfo.content));
+    var cloudData = JSON.parse(b64ToUtf8(finfo.content));
     // Merge incoming changes
     for (var key in changes) {
       if (changes.hasOwnProperty(key) && typeof changes[key] === 'object') {
